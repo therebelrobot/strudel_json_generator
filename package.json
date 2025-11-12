@@ -1,6 +1,6 @@
 {
   "name": "strudel-json-generator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Generate strudel.json files for audio sample libraries with watch mode support",
   "main": "dist/index.js",
   "bin": {

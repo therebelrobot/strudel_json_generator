@@ -38,26 +38,38 @@ npm install -g strudel-json-generator
 
 ![Sample Directory Structure](media/image-0.png)
 
-2. Run the generator:
+2. Run the generator with **either** a full base URL **or** GitHub repository details:
 
+**Option A - Using a custom base URL:**
+```bash
+npx strudel-json-generator -p <path> --base-url <url>
+```
+
+**Option B - Using GitHub repository details:**
 ```bash
 npx strudel-json-generator -p <path> -u <username> -r <repo>
 ```
 
 **Required Options:**
 - `-p, --path <path>`: Path to your root sample directory
-- `-u, --username <username>`: Your GitHub username
-- `-r, --repo <repo>`: Your GitHub repository name
+- **Either:**
+  - `--base-url <url>`: Full base URL where samples will be hosted, OR
+  - `-u, --username <username>` + `-r, --repo <repo>`: GitHub username and repository name
 
 **Optional Options:**
-- `-b, --branch <branch>`: Repository branch name (defaults to `main`)
+- `-b, --branch <branch>`: Repository branch name (defaults to `main`, only used with GitHub option)
 - `-w, --watch`: Enable watch mode for automatic regeneration
 
 ### Examples
 
-**Basic generation:**
+**Using GitHub repository (original method):**
 ```bash
 npx strudel-json-generator -p /Users/yourname/Desktop/audio -u yourname -r super_samples
+```
+
+**Using a custom base URL (for CDNs, custom servers, etc.):**
+```bash
+npx strudel-json-generator -p ./audio --base-url https://cdn.example.com/samples
 ```
 
 **With custom branch:**
@@ -68,6 +80,11 @@ npx strudel-json-generator -p ./audio -u yourname -r super_samples -b develop
 **Watch mode (automatically regenerates on file changes):**
 ```bash
 npx strudel-json-generator -p ./audio -u yourname -r super_samples --watch
+```
+
+**Custom base URL with watch mode:**
+```bash
+npx strudel-json-generator -p ./audio --base-url https://cdn.example.com/samples --watch
 ```
 
 The generator will create a `strudel.json` file in the specified directory.

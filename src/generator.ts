@@ -8,15 +8,16 @@ export interface StrudelData {
 
 export interface GeneratorOptions {
   rootPath: string;
-  githubUser: string;
-  githubRepo: string;
+  baseUrl?: string;
+  githubUser?: string;
+  githubRepo?: string;
   githubBranch?: string;
 }
 
 const AUDIO_EXTENSIONS = new Set(['.wav', '.mp3', '.flac', '.aiff']);
 
 export async function createStrudelJson(options: GeneratorOptions): Promise<void> {
-  const { rootPath, githubUser, githubRepo, githubBranch = 'main' } = options;
+  const { rootPath, baseUrl, githubUser, githubRepo, githubBranch = 'main' } = options;
 
   // Verify the path exists and is a directory
   try {
@@ -31,8 +32,19 @@ export async function createStrudelJson(options: GeneratorOptions): Promise<void
     throw error;
   }
 
-  const baseUrl = `https://raw.githubusercontent.com/${githubUser}/${githubRepo}/${githubBranch}/`;
-  const strudelData: StrudelData = { _base: baseUrl };
+  // Determine the base URL
+  let finalBaseUrl: string;
+  if (baseUrl) {
+    // Use the provided base URL directly
+    finalBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+  } else if (githubUser && githubRepo) {
+    // Build GitHub raw URL from user/repo/branch
+    finalBaseUrl = `https://raw.githubusercontent.com/${githubUser}/${githubRepo}/${githubBranch}/`;
+  } else {
+    throw new Error('Either --base-url or both --username and --repo must be provided.');
+  }
+
+  const strudelData: StrudelData = { _base: finalBaseUrl };
 
   let foundAudioFiles = false;
 

@@ -22,8 +22,9 @@ async function getPackageVersion(): Promise<string> {
 
 interface CliOptions {
   path: string;
-  username: string;
-  repo: string;
+  baseUrl?: string;
+  username?: string;
+  repo?: string;
   branch?: string;
   watch?: boolean;
 }
@@ -32,6 +33,7 @@ async function generate(options: CliOptions): Promise<void> {
   try {
     await createStrudelJson({
       rootPath: path.resolve(options.path),
+      baseUrl: options.baseUrl,
       githubUser: options.username,
       githubRepo: options.repo,
       githubBranch: options.branch,
@@ -111,11 +113,21 @@ async function main(): Promise<void> {
     .description('Generate strudel.json files for audio sample libraries')
     .version(version)
     .requiredOption('-p, --path <path>', 'Path to the local root directory to scan')
-    .requiredOption('-u, --username <username>', 'Your GitHub username')
-    .requiredOption('-r, --repo <repo>', 'Your GitHub repository name')
+    .option('--base-url <url>', 'Full base URL for samples (alternative to username/repo)')
+    .option('-u, --username <username>', 'Your GitHub username')
+    .option('-r, --repo <repo>', 'Your GitHub repository name')
     .option('-b, --branch <branch>', 'Your GitHub repository branch name', 'main')
     .option('-w, --watch', 'Watch mode: automatically regenerate on file changes')
     .action(async (options: CliOptions) => {
+      // Validate that either baseUrl OR both username+repo are provided
+      const hasBaseUrl = !!options.baseUrl;
+      const hasGithubInfo = !!(options.username && options.repo);
+
+      if (!hasBaseUrl && !hasGithubInfo) {
+        console.error('Error: Either --base-url or both --username and --repo must be provided.');
+        process.exit(1);
+      }
+
       if (options.watch) {
         await startWatchMode(options);
       } else {
